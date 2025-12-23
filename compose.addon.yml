@@ -1,0 +1,23 @@
+services:
+  sleep-checkins:
+    build: .
+    env_file:
+      - .env
+    networks:
+      - garmin_net
+    volumes:
+      - ./exports:/app/exports
+      - ./data:/app/data
+      #this may break down and revert back to UTC if using non linux timezones
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    #need this to use system time for the measurements
+    environment:
+      - LOCAL_TIMEZONE
+      - TZ
+
+
+networks:
+  garmin_net:
+    external: true
+    name: garmin-grafana_default
