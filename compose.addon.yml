@@ -1,4 +1,5 @@
 services:
+  #keeping this container for one-shot runs for now
   sleep-checkins:
     build: .
     env_file:
@@ -15,6 +16,32 @@ services:
     environment:
       - LOCAL_TIMEZONE
       - TZ
+  #main container that does the scheduled runs   
+  sleep-checkins-scheduler:
+    build: .
+    env_file:
+      - .env
+    networks:
+      - garmin_net
+    volumes:
+      - ./exports:/app/exports
+      - ./data:/app/data
+      #this may break down and revert back to UTC if using non linux timezones
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    environment:
+      #need the below two to use system time for the measurements rather than UTC
+      - LOCAL_TIMEZONE
+      - TZ
+      #how often are we checking if a new sleep has been created every 30min = 1800 sec
+      - CHECK_INTERVAL_SECONDS=1800
+      - JITTER_SECONDS=10
+      #allows for modification of the script used
+      - SCHEDULER_TARGET=fixed_message:run_once
+    #calls the scheduler function that is constantly running
+    command: ["python", "src/scheduler.py"]
+    #will continue to persist even across restarts of the machine
+    restart: unless-stopped
 
 
 networks:

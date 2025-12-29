@@ -89,9 +89,9 @@ def select_current_and_prior_week(points: List[Dict]) -> Optional[Tuple[Dict, Li
     prior_week = [p for (t, p) in dated if start <= t < current_time]
     return current, prior_week
 
+#run one check/send cycle and return T?F depending on if a message is sent
+def run_once() -> bool:
 
-def main() -> None:
-    
     client = connect_influx()
     points = fetch_sleep_summary_last_days(client, days=8)
     selection = select_current_and_prior_week(points)
@@ -106,14 +106,19 @@ def main() -> None:
     last = load_last_sent_key()
     if last == sleep_key:
         print(f"Already sent for {sleep_key}; skipping.")
-        return
+        return False
 
-    
     text = build_sleep_summary_text(current_sleep=current, prior_week_sleeps=prior_week_points)
 
     send_message(text)
     save_last_sent_key(sleep_key)
     print("Sent Telegram sleep summary.")
+    return True
+
+
+def main() -> None:
+    run_once()
+    
 
 
 if __name__ == "__main__":
