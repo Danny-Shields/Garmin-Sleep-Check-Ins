@@ -165,5 +165,10 @@ def build_sleep_summary_text(current_sleep: Dict, prior_week_sleeps: List[Dict])
             f"Your {metric_label(metric)} was {fmt_current_value(metric, v)}; "
             f"this is {verdict} the previous week average of {fmt_avg_value(metric, avg)}."
         )
+        
+        #including a question to ellicit a response
+        lines.append(
+            f"Any thoughts on why your sleep was like this?"
+        )
 
     return "\n".join(lines)

@@ -306,6 +306,65 @@ def export_sleep_intraday(client: InfluxDBClient, tz_name: str, tzinfo_obj: time
     for metric in INTRADAY_METRICS:
         print(f"  Wrote {metric_paths[metric].name} ({metric_rows[metric]} rows)")
 
+def export_sleep_insight_journal(client: InfluxDBClient, tz_name: str, tzinfo_obj: timezone) -> None:
+    measurement = "SleepJournal"
+    jsonl_path = OUT_DIR / f"{measurement}.jsonl"
+    csv_path = OUT_DIR / f"{measurement}.csv"
+    local_header = local_time_header(tz_name)
+
+    with jsonl_path.open("w", encoding="utf-8") as jsonl_file:
+        points_iter = stream_points(client, measurement, CHUNK_SIZE)
+        try:
+            first = next(points_iter)
+        except StopIteration:
+            print(f"No {measurement} points found.")
+            return
+
+        # Column order (similar “structured” feel as your other CSVs)
+        preferred = [
+            "text",
+            "msg_type",
+            "from_name",
+            "from_username",
+            "from_id",
+            "chat_id",
+            "message_id",
+            "update_id",
+        ]
+
+        # Include any other fields/tags that might appear (excluding time + Device/Database_Name)
+        other_cols = [
+            k for k in first.keys()
+            if k != "time" and k not in preferred and not should_exclude_csv_col(k)
+        ]
+
+        fieldnames = [local_header] + preferred + other_cols + ["time_utc"]
+
+        with csv_path.open("w", encoding="utf-8", newline="") as csv_file:
+            w = csv.DictWriter(csv_file, fieldnames=fieldnames, extrasaction="ignore")
+            w.writeheader()
+
+            def write_point(p: Dict) -> None:
+                jsonl_file.write(json.dumps(p, ensure_ascii=False) + "\n")
+                dt_utc = parse_influx_time(p["time"])
+                dt_local = dt_utc.astimezone(tzinfo_obj)
+
+                row: Dict[str, object] = {local_header: format_local(dt_local, tz_name)}
+
+                for k in preferred:
+                    row[k] = p.get(k)
+                for k in other_cols:
+                    row[k] = p.get(k)
+
+                row["time_utc"] = format_utc(dt_utc)
+                w.writerow(row)
+
+            write_point(first)
+            for p in points_iter:
+                write_point(p)
+
+    print(f"  Wrote {measurement}.jsonl and {measurement}.csv")
+
 
 def main() -> None:
     client = connect_influx()
@@ -318,6 +377,11 @@ def main() -> None:
 
     if "SleepIntraday" in measurements:
         export_sleep_intraday(client, tz_name, tzinfo_obj)
+        
+    if "SleepJournal" in measurements:
+        export_sleep_insight_journal(client, tz_name, tzinfo_obj)
+    else:
+        print("No Sleep Journal entries to export")
 
     print("Done, check Garmin-Sleep-Check-Ins/exports for your files")
 
