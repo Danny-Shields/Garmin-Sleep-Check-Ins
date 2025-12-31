@@ -44,6 +44,19 @@ from telegram_client import send_message
 BOT_TOKEN = (os.getenv("TELEGRAM_BOT_TOKEN", "") or "").strip()
 CHAT_ID = (os.getenv("TELEGRAM_CHAT_ID", "") or "").strip()
 
+#error handling function if max_journal_char ins't a number in .env
+def get_int_env(name: str, default: int) -> int:
+    raw = (os.getenv(name, "") or "").strip()
+    if not raw:
+        return default
+    try:
+        v = int(raw)
+        return v if v > 0 else default
+    except ValueError:
+        return default
+
+MAX_JOURNAL_CHARS = get_int_env("MAX_JOURNAL_CHARS", 4096)
+
 STATE_PATH = Path("/app/data/telegram_listener_state.json")
 
 LONGPOLL_TIMEOUT = int(os.getenv("TELEGRAM_LONGPOLL_TIMEOUT_SECONDS", "50"))
@@ -58,7 +71,7 @@ def _api_url(method: str) -> str:
     return f"https://api.telegram.org/bot{BOT_TOKEN}/{method}"
 
 
-def sanitize_text(s: str, max_len: int = 512) -> str:
+def sanitize_text(s: str, max_len: int = MAX_JOURNAL_CHARS) -> str:
     s = s.strip()
     s = CONTROL.sub("", s)
     s = WHITESPACE.sub(" ", s).strip()
