@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 set -euo pipefail
-echo "==> Make sure you are in the root or the repo"
 
 COMPOSE_FILE="compose.addon.yml"
 
@@ -25,6 +24,11 @@ docker compose -f "$COMPOSE_FILE" ps
 
 echo ""
 echo "Done."
+
+#Including a couple helpful commands while the main services are running
+echo "For debugging if you want to see the output of your scheduler:"
+echo "docker compose -f compose.addon.yml logs -f sleep-checkins-scheduler"
+echo ""
 echo "Tip: run one-shots like this when needed it rebuilds the container to ensure saved updated scripts are included, note this isn't getting passed telegram variables or scheduled ones:"
-echo "docker compose -f compose.addon.yml run --rm --build sleep-checkins python /app/src/sleep_data_export.py"
+echo "docker compose -f compose.addon.yml run --rm --build sleep-checkins python /app/src/standalone_functions/sleep_data_export.py"
 

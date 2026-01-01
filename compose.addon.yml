@@ -34,11 +34,11 @@ services:
       #need the below two to use system time for the measurements rather than UTC
       - LOCAL_TIMEZONE
       - TZ
-      #how often are we checking if a new sleep has been created every 30min = 1800 sec
-      - CHECK_INTERVAL_SECONDS=1800
-      - JITTER_SECONDS=10
+      #how often are we checking if a new sleep has been created set in .env
+      - CHECK_INTERVAL_SECONDS
+      - JITTER_SECONDS
       #allows for modification of the script used
-      - SCHEDULER_TARGET=fixed_message:run_once
+      #- SCHEDULER_TARGET=fixed_message:run_once
     #calls the scheduler function that is constantly running
     command: ["python", "src/scheduler.py"]
     #will continue to persist even across restarts of the machine

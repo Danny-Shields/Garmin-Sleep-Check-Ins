@@ -21,7 +21,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, Iterable, List
 
-from deterministic_output import build_sleep_summary_text
+from deterministic_output import ../build_sleep_summary_text
 
 
 DEFAULT_JSONL = Path("data") / "Demo_SleepSummary.jsonl"
