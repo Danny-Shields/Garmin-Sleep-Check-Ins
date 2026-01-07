@@ -11,28 +11,26 @@ It then messages you through Telegram with the summary and you why the sleep was
 
 When you reply, it stores your info back into the influx database as a sleepJournal measure and acknowledges it has been saved.
 
-To see a demo of this on generic sleep data and the insight it would generate and the type of question it would ask you. Try out the demo.py. Note this is just for demo purposes it uses the command line not telegrm and your influx db will not be updated with your insight/response.
+![Example Graphical Sleep Summary](docs/sleep_report_2025-12-23.png)
 
-To export your data including your sleep journal entries in .csv files and .jsonl files use the sleep_data_export.py
+![Example Telegram Chat and User Responses](docs/example_chat.png)
 
-If you want to get rid of all of your sleepJournal measures in the database use the delete_sleep_jounral_entries.py
+There are demo functions that don't require connecting a garmin account or telegram. As well as ways to export all your data and delete all of your sleepJournal entries see the more detailed explenation of the one shot functions below.
 
 ##################
 #QUICKSTART GUIDE:
 ##################
-Make sure you have docker installed
+1) Install docker, already required for garmin-grafana
 
-Make sure you have the garmin-grafana repository installed and linked to your garmin account and there is data contained within it
+2) Ensure garmin-grafana is running and linked to your garmin account and there is data contained within the Influx database
 
-You will need to have telegram insalled on the device you wish to communicate with this on i.e.) cellphone 
-You need to setup a bot chat using botfather make note of the TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID, see below section on details for setting this up.
+3) You will need to a device with telegram to create a chat for this to communicate with, on the device setup a bot chat (see below Setting up Telegram Bot section below).
 
-Change the file name of the .env.example to just .env so that your docker container will know to use it and input the two telegram variable values so the program knows what chat to read and send messages to.
+4) Change the file name of the .env.example to .env so that your docker container will know to use it and input the required telegram chat variables.
 
-For now you can start up the program by running the rebuild.sh bash script from the terminal. Ensure you are in the Garmin-Sleep-Check-Ins folder and then run "bash rebuild.sh" there are two persistant containers one for polling the InfluxDatabase looking for new sleep data. And one to do longPolling of the telegram chat looking for new sleepJournal messages that need to be saved in the database.
- 
-To run one of the standalone python programs i.e.) demo.py, delete_sleep_journal_entries.py, sleep_data_export.py programs navigate into the Garmin-Sleep-Chek-Ins folder and use the below command currently written for demo.py but easily changed to any of the other one-shot scripts:
-docker compose -f compose.addon.yml run --rm --build sleep-checkins python /app/src/demo.py
+5) Run the "rebuild.sh" bash script from within the repo folder. 
+
+You are done, you should get an initial message for the day and as new sleeps are uploaded to garmin connect and appear in your influx database you will get a message. Note there may be a delay for the first appearing in the garmin-grafana database (default 5min) and then for the polling for a message to be sent (default 10min). 
 
 #########################
 #Setting up Telegram Bot:
@@ -57,4 +55,25 @@ Then in a web browswer navigate to putting in your bot token from the previous s
 https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/getUpdates
 
 Please note the JSON message won't appear if you are already running the telegram-listener service so you will need to stop the container
+
+##############
+#How it works:
+##############
+
+There are two persistant containers one for polling the InfluxDatabase looking for new sleep data. And one to do longPolling of the telegram chat looking for new sleepJournal messages that need to be saved in the database. Both of these containers "sleep-checkins-scheduler" and "telegram-listener" must be running to be able to properly send messages and have them saved to the chat.
+
+The "sleep-checkins" container is for running one-shot functions that don't need to be persistently running.
+
+#####################
+#One Shot Functions:
+#####################
+
+To run one of the standalone python programs i.e.) demo.py, delete_sleep_journal_entries.py, sleep_data_export.py programs navigate into the Garmin-Sleep-Chek-Ins folder and use the below command currently written for demo.py but easily changed to any of the other one-shot scripts:
+docker compose -f compose.addon.yml run --rm --build sleep-checkins python /app/src/demo.py
+
+To see a demo of this on generic sleep data and the insight it would generate and the type of question it would ask you. Try out the demo.py. Note this is just for demo purposes it uses the command line not telegrm and your influx db will not be updated with your insight/response.
+
+To export your data including your sleep journal entries in .csv files and .jsonl files use the sleep_data_export.py
+
+If you want to get rid of all of your sleepJournal measures in the database use the delete_sleep_jounral_entries.py
 
