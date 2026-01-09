@@ -35,6 +35,7 @@ You are done, you should get an initial message for the day and as new sleeps ar
 #########################
 #Setting up Telegram Bot:
 #########################
+
 Download telegram 
 
 In the search look for BotFather make sure you choose the one with the checkmark
@@ -68,12 +69,21 @@ The "sleep-checkins" container is for running one-shot functions that don't need
 #One Shot Functions:
 #####################
 
-To run one of the standalone python programs i.e.) demo.py, delete_sleep_journal_entries.py, sleep_data_export.py programs navigate into the Garmin-Sleep-Chek-Ins folder and use the below command currently written for demo.py but easily changed to any of the other one-shot scripts:
-docker compose -f compose.addon.yml run --rm --build sleep-checkins python /app/src/demo.py
+To run one of the standalone python programs us the helper bash script run_standalone.sh This will allow you to select which function you want to run i.e.) demo.py, delete_sleep_journal_entries.py, sleep_data_export.py
 
-To see a demo of this on generic sleep data and the insight it would generate and the type of question it would ask you. Try out the demo.py. Note this is just for demo purposes it uses the command line not telegrm and your influx db will not be updated with your insight/response.
+Run demo.py - To see a demo of this on generic sleep data and the insight it would generate and the type of question it would ask you. Try out the demo.py. Note this is just for demo purposes it uses the command line not telegrm and your influx db will not be updated with your insight/response.
 
-To export your data including your sleep journal entries in .csv files and .jsonl files use the sleep_data_export.py
+Run sleep_data_export.py - To export your data including your sleep journal entries in .csv files and .jsonl files use the sleep_data_export.py
 
-If you want to get rid of all of your sleepJournal measures in the database use the delete_sleep_jounral_entries.py
+Run delete_sleep_journal_entries.py - If you want to get rid of all of your sleepJournal measures in the database use the delete_sleep_jounral_entries.py
+
+
+#################
+#Known Limitations
+##################
+
+64 bit architecture is required for running this. 32 bit architecture fails to load the docker images.
+
+This has been tested on Linux Ubuntu. It is expected that outside of linux the time zone import into the container will fail resulting in the non-local time to fail.
+
 

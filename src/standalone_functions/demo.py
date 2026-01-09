@@ -51,6 +51,8 @@ REPO_ROOT = SRC_DIR.parent                   # repo root
 if str(SRC_DIR) not in sys.path:
     sys.path.insert(0, str(SRC_DIR))
 
+#import the method to call the image summary
+from fixed_image_summary import run_once
 
 # -----------------------
 # Time + JSONL helpers
@@ -309,14 +311,6 @@ def main() -> None:
     text = build_text_summary(current_sleep=current, prior_week=prior_week)
     print(text)
 
-    # 3) Build image summary
-    print("\n=== IMAGE SUMMARY (sample data) ===\n")
-
-    try:
-        from image_summary import render_sleep_report_png  # type: ignore
-    except Exception as e:
-        raise SystemExit(f"Could not import image_summary renderer from src/: {e}")
-
     # Determine end time + session duration
     end_utc = parse_time_utc(str(current["time"]))
     sleep_sec = float(current.get("sleepTimeSeconds") or 0)
@@ -344,16 +338,24 @@ def main() -> None:
     day_key = end_utc.astimezone(ZoneInfo(tz_name)).date().isoformat() if ZoneInfo else end_utc.date().isoformat()
     out_path = out_dir / f"demo_sleep_report_{day_key}.png"
 
-    render_sleep_report_png(
-        current_summary=current,
-        session=session,               # duck-typed: needs .points
-        baselines=baselines,
-        output_path=out_path,
-        show_mean=True,
-        display_tz=tz_name,
-    )
+    # 3) Build image summary
+    print("\n=== IMAGE SUMMARY (sample data) ===\n")
 
-    try_open_image(out_path)
+    # Run the same pipeline used by the scheduler,
+    # but disable telegram and force a day from sample data.
+    try:
+        run_once(
+            summary_days=30,
+            show_mean=True,
+            send_telegram=False,   # critical: demo only
+            day=day_key,           # derived from Demo_SleepSummary.jsonl
+            display_tz=tz_name,
+        )
+        print("\nThe program succesfully saved " + str(day_key) + " sleep summary in exports folder")
+    except Exception as e:
+        raise SystemExit(f"Could not import run_once method from fixed_image_summary in src/: {e}")
+
+    \
 
 
 if __name__ == "__main__":
