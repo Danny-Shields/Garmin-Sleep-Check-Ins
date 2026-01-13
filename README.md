@@ -11,7 +11,7 @@ It then messages you through Telegram with the summary and you why the sleep was
 
 When you reply, it stores your info back into the influx database as a sleepJournal measure and acknowledges it has been saved.
 
-<p align='Center".
+<p align="Center">
 	<img src="docs/sleep_report_2025-12-23.png" width="100%">
 	<br>
 	<i>Example summary image generated.</i>
