@@ -11,9 +11,9 @@ It then messages you through Telegram with the summary and you why the sleep was
 
 When you reply, it stores your info back into the influx database as a sleepJournal measure and acknowledges it has been saved.
 
-![Example Graphical Sleep Summary](docs/sleep_report_2025-12-23.png)
+<img src="docs/sleep_report_2025-12-23.png" width="50%" alt="Example summary image.">
 
-![Example Telegram Chat and User Responses](docs/example_chat.png)
+<img src="docs/example_chat.png" width="50%" alt="Example chat in Telegram.">
 
 There are demo functions that don't require connecting a garmin account or telegram. As well as ways to export all your data and delete all of your sleepJournal entries see the more detailed explenation of the one shot functions below.
 
@@ -71,11 +71,11 @@ The "sleep-checkins" container is for running one-shot functions that don't need
 
 To run one of the standalone python programs us the helper bash script run_standalone.sh This will allow you to select which function you want to run i.e.) demo.py, delete_sleep_journal_entries.py, sleep_data_export.py
 
-Run demo.py - To see a demo of this on generic sleep data and the insight it would generate and the type of question it would ask you. Try out the demo.py. Note this is just for demo purposes it uses the command line not telegrm and your influx db will not be updated with your insight/response.
+Run demo.py - To see a demo of this on generic sleep data and the insight it would generate and the type of question it would ask you. Try out the demo.py. Note this is just for demo purposes it uses the command line not telegram and your influx db will not be updated with your insight/response.
 
 Run sleep_data_export.py - To export your data including your sleep journal entries in .csv files and .jsonl files use the sleep_data_export.py
 
-Run delete_sleep_journal_entries.py - If you want to get rid of all of your sleepJournal measures in the database use the delete_sleep_jounral_entries.py
+Run delete_sleep_journal_entries.py - If you want to get rid of all of your sleepJournal measures in the database use the delete_sleep_journal_entries.py
 
 
 #################
