@@ -15,7 +15,7 @@ Garmin Sleep Check-Ins is a self-hosted add-on for the
 	<img src="docs/sleep_report_2025-12-23.png" width="100%">
 	<br>
 	<i>Example summary image generated.</i>
-	<br>
+	<br><br>
 	<img src="docs/example_chat.png" width="50%">
 	<br>
 	<i>Example chat in Telegram.</i>
