@@ -11,14 +11,19 @@ It then messages you through Telegram with the summary and you why the sleep was
 
 When you reply, it stores your info back into the influx database as a sleepJournal measure and acknowledges it has been saved.
 
-<img src="docs/sleep_report_2025-12-23.png" width="50%" alt="Example summary image.">
+<p align='Center".
+	<img src="docs/sleep_report_2025-12-23.png" width="100%">
+	<br>
+	<i>Example summary image generated.</i>
 
-<img src="docs/example_chat.png" width="50%" alt="Example chat in Telegram.">
+	<img src="docs/example_chat.png" width="50%">
+	<i>Example chat in Telegram.</i>
+</p>
 
 There are demo functions that don't require connecting a garmin account or telegram. As well as ways to export all your data and delete all of your sleepJournal entries see the more detailed explenation of the one shot functions below.
 
 ##################
-#QUICKSTART GUIDE:
+##QUICKSTART GUIDE:
 ##################
 1) Install docker, already required for garmin-grafana
 
@@ -33,7 +38,7 @@ There are demo functions that don't require connecting a garmin account or teleg
 You are done, you should get an initial message for the day and as new sleeps are uploaded to garmin connect and appear in your influx database you will get a message. Note there may be a delay for the first appearing in the garmin-grafana database (default 5min) and then for the polling for a message to be sent (default 10min). 
 
 #########################
-#Setting up Telegram Bot:
+##Setting up Telegram Bot:
 #########################
 
 Download telegram 
@@ -58,7 +63,7 @@ https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/getUpdates
 Please note the JSON message won't appear if you are already running the telegram-listener service so you will need to stop the container
 
 ##############
-#How it works:
+##How it works:
 ##############
 
 There are two persistant containers one for polling the InfluxDatabase looking for new sleep data. And one to do longPolling of the telegram chat looking for new sleepJournal messages that need to be saved in the database. Both of these containers "sleep-checkins-scheduler" and "telegram-listener" must be running to be able to properly send messages and have them saved to the chat.
@@ -66,7 +71,7 @@ There are two persistant containers one for polling the InfluxDatabase looking f
 The "sleep-checkins" container is for running one-shot functions that don't need to be persistently running.
 
 #####################
-#One Shot Functions:
+##One Shot Functions:
 #####################
 
 To run one of the standalone python programs us the helper bash script run_standalone.sh This will allow you to select which function you want to run i.e.) demo.py, delete_sleep_journal_entries.py, sleep_data_export.py
@@ -79,7 +84,7 @@ Run delete_sleep_journal_entries.py - If you want to get rid of all of your slee
 
 
 #################
-#Known Limitations
+##Known Limitations
 ##################
 
 64 bit architecture is required for running this. 32 bit architecture fails to load the docker images.
