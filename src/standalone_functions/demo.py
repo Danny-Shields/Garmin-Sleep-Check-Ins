@@ -336,7 +336,6 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     day_key = end_utc.astimezone(ZoneInfo(tz_name)).date().isoformat() if ZoneInfo else end_utc.date().isoformat()
-    out_path = out_dir / f"demo_sleep_report_{day_key}.png"
 
     # 3) Build image summary
     print("\n=== IMAGE SUMMARY (sample data) ===\n")
@@ -347,6 +346,7 @@ def main() -> None:
         run_once(
             summary_days=30,
             show_mean=True,
+            show_sigma=True,
             send_telegram=False,   # critical: demo only
             day=day_key,           # derived from Demo_SleepSummary.jsonl
             display_tz=tz_name,

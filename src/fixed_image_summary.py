@@ -181,6 +181,7 @@ def run_once(
     *,
     summary_days: int = 30,
     show_mean: bool = True,
+    show_sigma: bool = True,
     send_telegram: bool = True,
     day: str | None = None,
     display_tz: str = "America/Toronto",
@@ -258,18 +259,20 @@ def run_once(
 
     out_path = out_dir / f"sleep_report_{day_key}.png"
 
+    #the main function call to create the image contained in image_summary.py
     render_sleep_report_png(
         current_summary=current,
         session=session,
         baselines=baselines,
         output_path=out_path,
         show_mean=show_mean,
+        show_sigma=show_sigma,
         display_tz=display_tz,
     )
 
     print("Wrote:", out_path)
 
-    # BUGFIX: Only update last_sent_key when we actually send to Telegram AND it succeeds.
+    #Only update last_sent_key when we actually send to Telegram AND it succeeds.
     if send_telegram:
         sent_ok = telegram_send_photo(out_path, caption=f"Sleep Summary ({day_key}) \nAny thoughts on why your sleep was like this?")
         if sent_ok:
@@ -281,13 +284,14 @@ def run_once(
 
     return True
 
-
+#this currently isn't being used demo.py and scheduler.py use the render_sleep_report_png, but leaving this in here is someone want to call it with arguments.
 def main() -> None:
     import argparse
 
     p = argparse.ArgumentParser(description="Generate and optionally send the sleep summary PNG.")
     p.add_argument("--summary-days", type=int, default=30, help="Days of summaries to fetch for baselines.")
     p.add_argument("--hide-mean", action="store_true", help="Hide μ (mean) on each card; default shows it.")
+    p.add_argument("--hide-sigma", action="store_true", help="Hide sigma (std dev) on each card; default shows it.")
     p.add_argument("--day", type=str, default=None, help="Generate a specific local day (YYYY-MM-DD) instead of latest.")
     p.add_argument(
         "--display-tz",
@@ -301,6 +305,7 @@ def main() -> None:
     run_once(
         summary_days=args.summary_days,
         show_mean=(not args.hide_mean),
+        show_sigma=(not args.hide_sigma),
         send_telegram=not args.no_telegram,
         day=args.day,
         display_tz=args.display_tz,

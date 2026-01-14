@@ -61,8 +61,12 @@ STAGE_MAP = {
     3: {"name": "Awake", "level": 4, "color": "#FF6B6B"},
 }
 
+#setting color for the background the main stats and the Mean and sigma values if present
 BG_COLOR = "#0B1020"
-STAT_TEXT_COLOR = "#6FA8FF"
+STAT_TEXT_COLOR = "#FFFFFF"
+SUB_STAT_COLOR = "#dcdee0"
+
+
 
 # --- Balanced diverging palette (bad → neutral → good), binned by sigma ---
 NEUTRAL_HEX = "#a1a38c"
@@ -236,11 +240,10 @@ def render_sleep_stage_axis(
 
     # Legend (below axis)
     handles = [
-        Patch(facecolor=STAGE_MAP[1]["color"], label="Deep"),
-        Patch(facecolor=STAGE_MAP[2]["color"], label="Light"),
-        Patch(facecolor=STAGE_MAP[3]["color"], label="REM"),
-        Patch(facecolor=STAGE_MAP[0]["color"], label="Awake"),
+        Patch(facecolor=meta["color"], label=meta["name"])
+        for _, meta in sorted(STAGE_MAP.items())
     ]
+
     leg = ax.legend(
         handles=handles,
         loc="upper center",
@@ -290,6 +293,7 @@ def draw_metric_cards(
     *,
     cols: int = 3,
     show_mean: bool = True,
+    show_sigma: bool = True,
 ) -> None:
     """
     Cards are colored by signed z-score in the 'good direction'.
@@ -346,18 +350,18 @@ def draw_metric_cards(
                 linewidth=1.0,
             )
         )
-
-        ax.text(
-            x + card_w - right_pad,
-            y + card_h - sigma_top_offset,
-            f"σ = {sigma:.2f}",
-            ha="right",
-            va="top",
-            fontsize=11,
-            color="white",
-            clip_on=False,
-            zorder=20,
-        )
+        if show_sigma:
+            ax.text(
+                x + card_w - right_pad,
+                y + card_h - sigma_top_offset,
+                f"σ = {sigma:.2f}",
+                ha="right",
+                va="top",
+                fontsize=11,
+                color=SUB_STAT_COLOR,
+                clip_on=False,
+                zorder=20,
+            )
 
         if show_mean:
             ax.text(
@@ -367,7 +371,7 @@ def draw_metric_cards(
                 ha="right",
                 va="top",
                 fontsize=10,
-                color="white",
+                color=SUB_STAT_COLOR,
                 clip_on=False,
                 zorder=20,
             )
@@ -380,7 +384,7 @@ def draw_metric_cards(
             ha="center",
             va="center",
             fontsize=28,
-            color="white",
+            color=STAT_TEXT_COLOR,
             fontweight="bold",
             zorder=10,
         )
@@ -391,7 +395,7 @@ def draw_metric_cards(
             ha="center",
             va="center",
             fontsize=14,
-            color="white",
+            color=STAT_TEXT_COLOR,
             zorder=10,
         )
 
@@ -403,6 +407,7 @@ def render_sleep_report_png(
     baselines: Mapping[str, Tuple[float, float]],
     output_path: str | Path,
     show_mean: bool = True,
+    show_sigma: bool = True,
     display_tz: str = "America/Toronto",
     legend_below_y: float = -0.12,
 ) -> Path:
@@ -427,7 +432,7 @@ def render_sleep_report_png(
     ax_cards = fig.add_subplot(gs[1, 0])
 
     render_sleep_stage_axis(ax_stage, session, display_tz=tz_out, legend_below_y=legend_below_y)
-    draw_metric_cards(ax_cards, current_summary, baselines, cols=3, show_mean=show_mean)
+    draw_metric_cards(ax_cards, current_summary, baselines, cols=3, show_mean=show_mean, show_sigma=show_sigma)
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
